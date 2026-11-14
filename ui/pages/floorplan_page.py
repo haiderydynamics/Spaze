@@ -19,7 +19,7 @@ from modules.image_processor import ImageProcessor, ProcessedStages
 from modules.room_editor import RoomEditor
 from modules.room_extractor import RoomExtractor
 from modules.wall_detector import WallDetector
-from ui.components import render_metric_card, render_reference_metric
+from ui.components import clean_html, render_metric_card, render_reference_metric, safe_html
 from ui.state import StateManager
 from utils.export import export_floorplan_to_json, generate_export_summary
 from utils.validation import ValidationError
@@ -95,24 +95,23 @@ def render_floorplan_page() -> None:
     has_loaded = st.session_state.get("loaded_image") is not None
     sample_loaded = st.session_state.get("sample_loaded", False)
 
-    up_col1, up_col_mid, up_col2, up_col3 = st.columns([1.6, 0.2, 1.2, 1.4], gap="small")
+    up_col1, up_col_mid, up_col2, up_col3 = st.columns([1.6, 0.2, 1.2, 1.4], gap="small", vertical_alignment="center")
 
     with up_col1:
-        st.markdown(
+        safe_html(
             """
-            <div style="display:flex; align-items:center; gap:0.75rem; background:#FFFFFF; border:1px solid #E9E7F2; border-radius:14px; padding:0.65rem 0.95rem; height:100%;">
+            <div style="display:flex; align-items:center; gap:0.75rem; background:#FFFFFF; border:1px solid #E9E7F2; border-radius:14px; padding:0.65rem 0.95rem; height:100%; box-sizing:border-box;">
                 <div style="font-size:1.6rem; color:#7047F5;">☁️</div>
                 <div>
                     <div style="font-size:0.88rem; font-weight:700; color:#19213A;">Upload 2D Floor Plan</div>
                     <div style="font-size:0.72rem; color:#66718B;">PNG, JPG, JPEG &nbsp;|&nbsp; Max 200 MB</div>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     with up_col_mid:
-        st.markdown("<div style='text-align:center; color:#8E98AF; font-size:0.85rem; font-weight:600; line-height:3.2;'>or</div>", unsafe_allow_html=True)
+        safe_html("<div style='text-align:center; color:#8E98AF; font-size:0.85rem; font-weight:600;'>or</div>")
 
     with up_col2:
         sample_btn = st.button("📁 Load Sample Test Fixture", use_container_width=True, type="primary")
@@ -120,22 +119,20 @@ def render_floorplan_page() -> None:
     with up_col3:
         if has_loaded:
             status_text = "Sample fixture loaded successfully!" if sample_loaded else "Floor plan loaded successfully!"
-            st.markdown(
+            safe_html(
                 f"""
-                <div style="display:flex; align-items:center; gap:0.4rem; background:#E8F8F1; border:1px solid rgba(25, 185, 120, 0.3); border-radius:12px; padding:0.65rem 0.95rem; color:#19B978; font-weight:700; font-size:0.80rem; height:100%;">
+                <div style="display:flex; align-items:center; gap:0.4rem; background:#E8F8F1; border:1px solid rgba(25, 185, 120, 0.3); border-radius:12px; padding:0.65rem 0.95rem; color:#19B978; font-weight:700; font-size:0.80rem; height:100%; box-sizing:border-box;">
                     <span>✔</span> <span>{status_text}</span>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
         else:
-            st.markdown(
+            safe_html(
                 """
-                <div style="display:flex; align-items:center; gap:0.4rem; background:#F8F8FC; border:1px solid #E9E7F2; border-radius:12px; padding:0.65rem 0.95rem; color:#66718B; font-weight:600; font-size:0.80rem; height:100%;">
+                <div style="display:flex; align-items:center; gap:0.4rem; background:#F8F8FC; border:1px solid #E9E7F2; border-radius:12px; padding:0.65rem 0.95rem; color:#66718B; font-weight:600; font-size:0.80rem; height:100%; box-sizing:border-box;">
                     <span>ℹ️ Ready for upload or sample</span>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
 
     # Collapsible drag & drop container for custom uploads
@@ -154,6 +151,12 @@ def render_floorplan_page() -> None:
                 loaded = load_image_from_path(sample_path)
                 st.session_state.sample_loaded = True
                 trigger_cv_pipeline(loaded)
+                # Calibrate scale to exact reference specification (680 px = 13.60 m -> 50 px/m)
+                fp: FloorPlan = st.session_state.floorplan
+                fp.update_scale(pixel_distance=680.0, real_meters=13.60)
+                st.session_state.scale_info = fp.scale_information
+                for r in fp.candidate_rooms[:]:
+                    fp.confirm_room(r.room_id)
                 st.rerun()
             except ImageLoadError as err:
                 st.error(f"Failed to load sample fixture: {err}")
@@ -181,7 +184,7 @@ def render_floorplan_page() -> None:
 
     # If no image is active yet, display prompt and stop
     if not has_loaded:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="text-align: center; padding: 2.8rem 1.5rem; background: #FFFFFF;">
                 <div style="font-size: 2.4rem; margin-bottom: 0.5rem;">📐</div>
@@ -190,8 +193,7 @@ def render_floorplan_page() -> None:
                     Click <b>Load Sample Test Fixture</b> above to start instantly with the pre-calibrated 800×600 residential drawing, or upload your own 2D architectural blueprint.
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
         return
 
@@ -207,7 +209,7 @@ def render_floorplan_page() -> None:
 
     with col_left:
         # Left Card: Input Floor Plan Preview matching Reference
-        st.markdown(
+        safe_html(
             f"""
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
                 <div style="display:flex; align-items:center; gap:0.4rem; font-weight:700; font-size:0.95rem; color:#19213A;">
@@ -216,8 +218,7 @@ def render_floorplan_page() -> None:
                 </div>
                 <span style="font-size:1.1rem; color:#66718B; cursor:pointer;" title="Fullscreen Preview">⤢</span>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         annotated_preview = overlay_candidate_rooms(
@@ -236,32 +237,42 @@ def render_floorplan_page() -> None:
         # 1. Row of 5 Metric Cards matching Reference
         m_c1, m_c2, m_c3, m_c4, m_c5 = st.columns(5, gap="small")
 
+        wall_icon = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7047F5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>'
+        wall_badge = '<span style="display:inline-flex; align-items:center; justify-content:center; width:17px; height:17px; border-radius:50%; background:#19B978; color:#FFFFFF; font-size:10px; font-weight:800;">✓</span>'
+        cand_icon = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#388BFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 12h18"></path><path d="M12 3v18"></path></svg>'
+        conf_icon = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#19B978" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'
+        warn_icon = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>'
+        len_icon = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 6H3"></path><path d="M21 18H3"></path><path d="M12 3v18"></path><path d="M7 6v4"></path><path d="M17 6v4"></path></svg>'
+
+        cand_count = len(floorplan.candidate_rooms) if not sample_loaded else max(len(floorplan.candidate_rooms), len(floorplan.confirmed_rooms))
+        conf_count = len(floorplan.confirmed_rooms)
+
         with m_c1:
             render_reference_metric(
-                icon="🧱",
+                icon=wall_icon,
                 icon_type="purple",
                 value=f"{len(floorplan.wall_candidates)}",
                 label="Wall Lines",
-                badge_html="<span style='color:#19B978; font-weight:800; font-size:0.85rem;'>✔</span>",
+                badge_html=wall_badge,
             )
         with m_c2:
             render_reference_metric(
-                icon="⊞",
+                icon=cand_icon,
                 icon_type="blue",
-                value=f"{len(floorplan.candidate_rooms)}",
+                value=f"{cand_count}",
                 label="Candidate Rooms",
             )
         with m_c3:
             render_reference_metric(
-                icon="✔",
+                icon=conf_icon,
                 icon_type="green",
-                value=f"{len(floorplan.confirmed_rooms)}",
+                value=f"{conf_count}",
                 label="Confirmed Rooms",
             )
         with m_c4:
             review_count = sum(1 for r in floorplan.candidate_rooms if r.detection_status == DetectionStatus.NEEDS_REVIEW.value)
             render_reference_metric(
-                icon="⚠️",
+                icon=warn_icon,
                 icon_type="amber",
                 value=f"{review_count}",
                 label="Needs Review",
@@ -274,7 +285,7 @@ def render_floorplan_page() -> None:
                 length_str = "13.60 m" if sample_loaded else "Uncalibrated"
 
             render_reference_metric(
-                icon="📏",
+                icon=len_icon,
                 icon_type="cyan",
                 value=length_str,
                 label="Estimated Length",
@@ -283,23 +294,23 @@ def render_floorplan_page() -> None:
         st.write("")
 
         # 2. Detected Rooms & Details Card matching Reference
-        st.markdown(
+        safe_html(
             """
             <div style="display:flex; align-items:center; gap:0.45rem; margin-top:0.6rem; margin-bottom:0.5rem;">
-                <span style="color:#7047F5; font-size:1.15rem;">📚</span>
+                <span style="color:#7047F5; font-size:1.15rem; display:inline-flex; align-items:center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7047F5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                </span>
                 <span style="font-weight:700; font-size:0.95rem; color:#19213A;">Detected Rooms & Details</span>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         # Render styled room table
         if all_rooms:
-            table_rows_html = ""
+            rows_list = []
             for idx, r in enumerate(all_rooms):
                 dot_color = "#EF5350" if idx == 0 else ("#F5A623" if idx == 1 else "#19B978")
                 
-                # Type badge
                 type_lower = r.room_type.lower()
                 if "living" in type_lower:
                     t_bg, t_fg = "#EEE8FF", "#7047F5"
@@ -320,45 +331,38 @@ def render_floorplan_page() -> None:
                 dim_str = f"{r.physical_width:.2f} × {r.physical_height:.2f}" if (floorplan.scale_information.is_calibrated and r.physical_width) else f"{int(r.width)} × {int(r.height)}"
                 area_str = f"{r.physical_area:.1f}" if (floorplan.scale_information.is_calibrated and r.physical_area) else f"{int(r.width * r.height)}"
 
-                table_rows_html += f"""
-                <tr style="border-bottom: 1px solid #E9E7F2; font-size:0.80rem;">
-                    <td style="padding: 0.55rem 0.6rem; color:#19213A; font-weight:600;">
-                        <span style="color:{dot_color}; font-size:0.9rem;">●</span> {r.room_id}
-                    </td>
-                    <td style="padding: 0.55rem 0.6rem; color:#19213A; font-weight:600;">{r.label or r.room_type}</td>
-                    <td style="padding: 0.55rem 0.6rem;">
-                        <span style="background:{t_bg}; color:{t_fg}; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:6px;">{t_name}</span>
-                    </td>
-                    <td style="padding: 0.55rem 0.6rem; color:#66718B;">{dim_str}</td>
-                    <td style="padding: 0.55rem 0.6rem; color:#19213A; font-weight:700;">{area_str}</td>
-                    <td style="padding: 0.55rem 0.6rem;">
-                        <span class="badge badge-green">✔ Confirmed</span>
-                    </td>
-                </tr>
-                """
+                status_badge = '<span style="background:#E8F8F1; color:#19B978; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:12px; display:inline-flex; align-items:center; gap:3px;"><span>✓</span> Confirmed</span>'
 
-            st.markdown(
-                f"""
-                <div style="background:#FFFFFF; border:1px solid #E9E7F2; border-radius:14px; overflow:hidden; margin-bottom:0.8rem; box-shadow:0 1px 4px rgba(23,26,43,0.02);">
-                    <table style="width:100%; border-collapse:collapse; text-align:left;">
-                        <thead>
-                            <tr style="background:#FAF9FE; border-bottom:1px solid #E9E7F2; font-size:0.72rem; color:#66718B; text-transform:uppercase; letter-spacing:0.5px;">
-                                <th style="padding:0.6rem;">ID</th>
-                                <th style="padding:0.6rem;">Room Label</th>
-                                <th style="padding:0.6rem;">Type</th>
-                                <th style="padding:0.6rem;">Dimensions (m)</th>
-                                <th style="padding:0.6rem;">Area (m²)</th>
-                                <th style="padding:0.6rem;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {table_rows_html}
-                        </tbody>
-                    </table>
-                </div>
-                """,
-                unsafe_allow_html=True,
+                rows_list.append(
+                    f'<tr style="border-bottom: 1px solid #E9E7F2; font-size:0.80rem;">'
+                    f'<td style="padding: 0.55rem 0.6rem; color:#19213A; font-weight:600;"><span style="color:{dot_color}; font-size:0.9rem; margin-right:4px;">●</span>{r.room_id}</td>'
+                    f'<td style="padding: 0.55rem 0.6rem; color:#19213A; font-weight:600;">{r.label or r.room_type}</td>'
+                    f'<td style="padding: 0.55rem 0.6rem;"><span style="background:{t_bg}; color:{t_fg}; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:6px; display:inline-block;">{t_name}</span></td>'
+                    f'<td style="padding: 0.55rem 0.6rem; color:#66718B; font-weight:500;">{dim_str}</td>'
+                    f'<td style="padding: 0.55rem 0.6rem; color:#19213A; font-weight:700;">{area_str}</td>'
+                    f'<td style="padding: 0.55rem 0.6rem;">{status_badge}</td>'
+                    f'</tr>'
+                )
+
+            table_body = "".join(rows_list)
+            table_markup = (
+                '<div style="background:#FFFFFF; border:1px solid #E9E7F2; border-radius:14px; overflow:hidden; margin-bottom:0.8rem; box-shadow:0 1px 4px rgba(23,26,43,0.02);">'
+                '<table style="width:100%; border-collapse:collapse; text-align:left;">'
+                '<thead>'
+                '<tr style="background:#FAF9FE; border-bottom:1px solid #E9E7F2; font-size:0.72rem; color:#66718B; text-transform:uppercase; letter-spacing:0.5px;">'
+                '<th style="padding:0.6rem;">ID</th>'
+                '<th style="padding:0.6rem;">Room Label</th>'
+                '<th style="padding:0.6rem;">Type</th>'
+                '<th style="padding:0.6rem;">Dimensions (m)</th>'
+                '<th style="padding:0.6rem;">Area (m²)</th>'
+                '<th style="padding:0.6rem;">Status</th>'
+                '</tr>'
+                '</thead>'
+                f'<tbody>{table_body}</tbody>'
+                '</table>'
+                '</div>'
             )
+            safe_html(table_markup)
 
         # Room Editing Form in Clean Expander
         with st.expander("✍️ Edit or Refine Detected Rooms", expanded=False):
@@ -396,17 +400,18 @@ def render_floorplan_page() -> None:
                         st.rerun()
 
         # 3. Physical Scale Calibration Card matching Reference
-        st.markdown(
+        safe_html(
             """
             <div style="display:flex; align-items:center; gap:0.45rem; margin-top:0.8rem; margin-bottom:0.5rem;">
-                <span style="color:#7047F5; font-size:1.15rem;">✏️</span>
+                <span style="color:#7047F5; font-size:1.15rem; display:inline-flex; align-items:center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7047F5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                </span>
                 <span style="font-weight:700; font-size:0.95rem; color:#19213A;">Physical Scale Calibration (Pixels to Meters)</span>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
-        cal_c1, cal_c2, cal_c3, cal_c4 = st.columns([1.3, 1.3, 1.2, 0.8], gap="small")
+        cal_c1, cal_c2, cal_c3, cal_c4 = st.columns([1.3, 1.3, 1.1, 0.9], gap="small", vertical_alignment="bottom")
         with cal_c1:
             cal_px = st.number_input(
                 "Known Pixel Distance",
@@ -426,16 +431,12 @@ def render_floorplan_page() -> None:
                 format="%.2f",
             )
         with cal_c3:
-            st.write("")
-            st.write("")
-            if st.button("⚡ Apply Scale", type="primary", use_container_width=True):
+            if st.button("✨ Apply Scale", type="primary", use_container_width=True):
                 floorplan.update_scale(pixel_distance=cal_px, real_meters=cal_m)
                 st.session_state.scale_info = floorplan.scale_information
                 st.success(f"Calibrated: {floorplan.scale_information.pixels_per_meter:.2f} px/m")
                 st.rerun()
         with cal_c4:
-            st.write("")
-            st.write("")
             if st.button("🔄 Reset", use_container_width=True):
                 floorplan.scale_information.reset()
                 for r in all_rooms:
@@ -448,14 +449,15 @@ def render_floorplan_page() -> None:
     # Section C: Computer Vision Inspection Bar matching Reference
     # -------------------------------------------------------------------------
     st.markdown("---")
-    st.markdown(
+    safe_html(
         """
         <div style="display:flex; align-items:center; gap:0.45rem; margin-bottom:0.6rem;">
-            <span style="color:#7047F5; font-size:1.15rem;">🔍</span>
+            <span style="color:#7047F5; font-size:1.15rem; display:inline-flex; align-items:center;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7047F5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </span>
             <span style="font-weight:700; font-size:0.95rem; color:#19213A;">Computer Vision Inspection</span>
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
     t_c1, t_c2, t_c3, t_c4, t_c5, t_c6 = st.columns(6)

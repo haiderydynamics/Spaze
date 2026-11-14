@@ -18,7 +18,7 @@ from cvae.config import CVAEConfig
 from cvae.infer import LayoutGenerationEngine
 from cvae.visualization import render_single_floorplan_axes
 from models.floorplan_schema import FloorPlan
-from ui.components import render_metric_card, render_page_header
+from ui.components import render_metric_card, render_page_header, safe_html
 from ui.state import StateManager
 from utils.export import export_floorplan_to_json
 
@@ -33,7 +33,7 @@ def render_generation_page() -> None:
 
     # 1. Verification of Input Floor Plan
     if not StateManager.has_floorplan():
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="text-align: center; padding: 2.5rem 1.5rem;">
                 <div style="font-size: 2.2rem; margin-bottom: 0.6rem;">⚠️</div>
@@ -42,8 +42,7 @@ def render_generation_page() -> None:
                     Please return to Stage 01 (Floor Plan Studio) to upload or load an architectural floor plan before running AI generation.
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
         if st.button("⬅️ Return to Stage 01: Floor Plan Studio", type="primary"):
             StateManager.set_stage("01_floorplan")
@@ -69,13 +68,12 @@ def render_generation_page() -> None:
     dash_col1, dash_col2 = st.columns([1.2, 1.8], gap="large")
 
     with dash_col1:
-        st.markdown(
+        safe_html(
             """
             <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:#69738B; letter-spacing:0.8px; margin-bottom:0.5rem;">
                 Input Architectural Program
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         # Source Blueprint Card
@@ -84,7 +82,7 @@ def render_generation_page() -> None:
         st.pyplot(fig_src, use_container_width=True)
         plt.close(fig_src)
 
-        st.markdown(
+        safe_html(
             f"""
             <div class="section-card" style="padding: 1.0rem; margin-top: 0.6rem; font-size: 0.82rem;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
@@ -100,8 +98,7 @@ def render_generation_page() -> None:
                     <span style="color:#171A2B; font-weight:600;">{len({r.room_type for r in active_rooms})} categories</span>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         if st.button("✏️ Edit Input Floor Plan", use_container_width=True):
@@ -109,13 +106,12 @@ def render_generation_page() -> None:
             st.rerun()
 
     with dash_col2:
-        st.markdown(
+        safe_html(
             """
             <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:#69738B; letter-spacing:0.8px; margin-bottom:0.5rem;">
                 Preference Configuration
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         # Preference Cards
@@ -192,7 +188,7 @@ def render_generation_page() -> None:
         curr_selected = st.session_state.get("selected_alt_idx", 0)
 
         st.markdown("---")
-        st.markdown(
+        safe_html(
             """
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.0rem;">
                 <div>
@@ -200,8 +196,7 @@ def render_generation_page() -> None:
                     <div style="font-size:0.82rem; color:#69738B;">Side-by-side comparison of 3 CVAE-synthesized layout options under active spatial constraints.</div>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         # Metric summary banner
@@ -230,7 +225,7 @@ def render_generation_page() -> None:
             border_style = "border: 2px solid #7047F5; box-shadow: 0 4px 18px rgba(112, 71, 245, 0.15);" if is_active else "border: 1px solid #E9E7F2;"
 
             with cols[idx]:
-                st.markdown(
+                safe_html(
                     f"""
                     <div class="section-card" style="{border_style} padding: 1.0rem; margin-bottom: 0.6rem;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
@@ -243,8 +238,7 @@ def render_generation_page() -> None:
                             Rooms: <b>{r_cnt}</b> &nbsp;|&nbsp; Area: <b>{area_str}</b>
                         </div>
                     </div>
-                    """,
-                    unsafe_allow_html=True,
+                    """
                 )
 
                 # Matplotlib blueprint axes
@@ -295,7 +289,7 @@ def render_generation_page() -> None:
                 StateManager.set_stage("03_visualization")
                 st.rerun()
     else:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="text-align: center; padding: 2.0rem; background: #FFFFFF; margin-top: 1.0rem;">
                 <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">💡</div>
@@ -304,6 +298,5 @@ def render_generation_page() -> None:
                     Click <b>Generate 3 Alternative Layouts</b> above to synthesize 3 preference-controlled floor plans.
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )

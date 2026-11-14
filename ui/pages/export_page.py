@@ -16,7 +16,7 @@ from cvae.config import CVAEConfig
 from geometry3d.exporter import ModelExporter
 from geometry3d.model_generator import generate_3d_model
 from models.floorplan_schema import FloorPlan
-from ui.components import render_page_header
+from ui.components import render_page_header, safe_html
 from ui.state import StateManager
 from utils.export import export_floorplan_to_json, generate_export_summary
 
@@ -32,7 +32,7 @@ def render_export_page() -> None:
     active_fp = StateManager.get_selected_alternative()
 
     if active_fp is None:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="text-align: center; padding: 2.5rem 1.5rem;">
                 <div style="font-size: 2.2rem; margin-bottom: 0.6rem;">📦</div>
@@ -41,8 +41,7 @@ def render_export_page() -> None:
                     Please upload or load a floor plan in Stage 01 to generate downloadable CAD, 3D mesh, and telemetry deliverables.
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
         if st.button("⬅️ Go to Stage 01: Floor Plan Studio", type="primary"):
             StateManager.set_stage("01_floorplan")
@@ -53,7 +52,7 @@ def render_export_page() -> None:
     rooms = active_fp.confirmed_rooms + active_fp.candidate_rooms
     source_tag = f"Alternative {st.session_state.get('selected_alt_idx', 0) + 1} ({active_fp.preference.replace('_', ' ').title()})" if active_fp.is_generated else "Source Floor Plan"
 
-    st.markdown(
+    safe_html(
         f"""
         <div class="section-card" style="padding: 1.1rem 1.4rem; margin-bottom: 1.4rem;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -70,25 +69,23 @@ def render_export_page() -> None:
                 Preference Mode: <b>{(active_fp.preference or 'source').replace('_', ' ').title()}</b>
             </div>
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
     # 2. Multi-Format Deliverables Grid (6 Cards)
-    st.markdown(
+    safe_html(
         """
         <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:#69738B; letter-spacing:0.8px; margin-bottom:0.75rem;">
             Available Project Deliverables
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
     row1_c1, row1_c2, row1_c3 = st.columns(3, gap="medium")
 
     # Card 1: 3D GLB Model
     with row1_c1:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="min-height: 250px; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0.5rem;">
                 <div>
@@ -129,7 +126,7 @@ def render_export_page() -> None:
 
     # Card 2: 2D Blueprint Layout PNG
     with row1_c2:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="min-height: 250px; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0.5rem;">
                 <div>
@@ -146,8 +143,7 @@ def render_export_page() -> None:
                     <span class="badge badge-green">Ready for Download</span>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         png_bytes = ModelExporter.export_floorplan_preview(active_fp)
@@ -162,7 +158,7 @@ def render_export_page() -> None:
 
     # Card 3: Structured Schema JSON
     with row1_c3:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="min-height: 250px; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0.5rem;">
                 <div>
@@ -179,8 +175,7 @@ def render_export_page() -> None:
                     <span class="badge badge-green">Ready for Download</span>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         json_str = export_floorplan_to_json(active_fp)
@@ -198,7 +193,7 @@ def render_export_page() -> None:
 
     # Card 4: Architectural Metadata Manifest
     with row2_c1:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="min-height: 250px; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0.5rem;">
                 <div>
@@ -215,8 +210,7 @@ def render_export_page() -> None:
                     <span class="badge badge-green">Ready for Download</span>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         cfg_geo = geometry3d.Geometry3DConfig()
@@ -239,7 +233,7 @@ def render_export_page() -> None:
         history_path = Path("training_logs/training_history.csv")
         has_csv = history_path.is_file()
 
-        st.markdown(
+        safe_html(
             f"""
             <div class="section-card" style="min-height: 250px; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0.5rem;">
                 <div>
@@ -258,8 +252,7 @@ def render_export_page() -> None:
                     </span>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         if has_csv:
@@ -277,7 +270,7 @@ def render_export_page() -> None:
 
     # Card 6: Academic Research Documentation
     with row2_c3:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="min-height: 250px; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0.5rem;">
                 <div>
@@ -294,8 +287,7 @@ def render_export_page() -> None:
                     <span class="badge badge-green">Ready for Download</span>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         abstract_path = Path("docs/project_abstract.md")

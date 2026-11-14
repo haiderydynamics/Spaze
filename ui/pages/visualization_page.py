@@ -24,7 +24,7 @@ from geometry3d.exporter import ModelExporter
 from geometry3d.model_generator import Model3DResult, generate_3d_model
 from geometry3d.viewer_adapter import ViewerAdapter
 from models.floorplan_schema import FloorPlan, Room, ScaleInfo
-from ui.components import render_metric_card, render_page_header
+from ui.components import render_metric_card, render_page_header, safe_html
 from ui.state import StateManager
 
 
@@ -105,7 +105,7 @@ def render_visualization_page() -> None:
     has_alts = StateManager.has_alternatives()
 
     if not has_fp and not has_alts:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="text-align: center; padding: 2.5rem 1.5rem;">
                 <div style="font-size: 2.2rem; margin-bottom: 0.6rem;">🧊</div>
@@ -114,8 +114,7 @@ def render_visualization_page() -> None:
                     Please upload an image in Stage 01 or load the pre-built residential demo layout below to inspect 3D geometry immediately.
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
         d_col1, d_col2 = st.columns([1, 2])
         with d_col1:
@@ -169,15 +168,14 @@ def render_visualization_page() -> None:
     with top_c2:
         rooms = target_floorplan.confirmed_rooms + target_floorplan.candidate_rooms
         scale_label = f"{target_floorplan.scale_information.pixels_per_meter:.1f} px/m" if target_floorplan.scale_information.is_calibrated else "Default (50 px/m)"
-        st.markdown(
+        safe_html(
             f"""
             <div style="background: #FFFFFF; border: 1px solid #E9E7F2; border-radius: 12px; padding: 0.75rem 1.0rem; font-size: 0.82rem; box-shadow: 0 1px 3px rgba(23,26,43,0.02); margin-top: 1.45rem;">
                 <span style="color:#69738B; font-weight:600;">Active Program:</span> <b style="color:#171A2B;">{len(rooms)} Rooms</b> &nbsp;|&nbsp; 
                 <span style="color:#69738B; font-weight:600;">Scale:</span> <b style="color:#171A2B;">{scale_label}</b><br>
                 <span style="color:#69738B; font-weight:600;">Preference:</span> <b style="color:#7047F5;">{(target_floorplan.preference or 'Source').replace('_', ' ').title()}</b>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     # 3. Main Workspace: LEFT (2D Reference), CENTER (3D Canvas), RIGHT (Controls)
@@ -185,13 +183,12 @@ def render_visualization_page() -> None:
     col_2d, col_3d, col_config = st.columns([1.1, 2.4, 1.1], gap="medium")
 
     with col_2d:
-        st.markdown(
+        safe_html(
             """
             <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:#69738B; letter-spacing:0.8px; margin-bottom:0.4rem;">
                 2D Layout Reference
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
         fig_2d, ax_2d = plt.subplots(figsize=(4.2, 3.8), facecolor="#FFFFFF")
         title_tag = f"Alt {st.session_state.get('selected_alt_idx', 0) + 1}" if target_floorplan.is_generated else "Source"
@@ -205,13 +202,12 @@ def render_visualization_page() -> None:
                 st.markdown(f"• **{r.label or r.room_type}**: {dim_str}")
 
     with col_config:
-        st.markdown(
+        safe_html(
             """
             <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:#69738B; letter-spacing:0.8px; margin-bottom:0.4rem;">
                 3D Model Parameters
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
         wall_height = st.slider(
             "Wall Height (m)",
@@ -242,13 +238,12 @@ def render_visualization_page() -> None:
             help="Interior room partition thickness.",
         )
 
-        st.markdown(
+        safe_html(
             """
             <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:#69738B; letter-spacing:0.8px; margin-top:0.8rem; margin-bottom:0.4rem;">
                 Semantic Layers
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
         show_floors = st.checkbox("Floors & Foundation", value=True)
         show_ext_walls = st.checkbox("Exterior Envelope Walls", value=True)
@@ -296,13 +291,12 @@ def render_visualization_page() -> None:
         st.session_state.active_3d_result = result
 
     with col_3d:
-        st.markdown(
+        safe_html(
             """
             <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:#69738B; letter-spacing:0.8px; margin-bottom:0.4rem;">
                 Interactive 3D Architectural Model
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
         if result is not None:
             fig = ViewerAdapter.scene_to_plotly(
@@ -325,13 +319,12 @@ def render_visualization_page() -> None:
     # 5. Diagnostic Metrics & Geometric Feasibility
     if result is not None:
         st.markdown("---")
-        st.markdown(
+        safe_html(
             """
             <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:#69738B; letter-spacing:0.8px; margin-bottom:0.6rem;">
                 Architectural Geometry Diagnostics
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
         m = result.metrics
 

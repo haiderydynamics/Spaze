@@ -51,6 +51,11 @@ def apply_spaze_theme() -> None:
             max-width: 1440px !important;
         }
 
+        /* Prevent Flexbox child overflow in multi-column dashboards */
+        [data-testid="column"] {
+            min-width: 0 !important;
+        }
+
         /* -------------------------------------------------------------
            2. Top Streamlit Native Header & Toolbar (Kill All Black Bars!)
         ------------------------------------------------------------- */
@@ -391,10 +396,12 @@ def apply_spaze_theme() -> None:
             background: #FFFFFF;
             border: 1px solid #E9E7F2;
             border-radius: 14px;
-            padding: 0.85rem 1.0rem;
-            box-shadow: 0 2px 8px rgba(23, 26, 43, 0.025);
+            padding: 0.65rem 0.70rem;
+            box-shadow: 0 1px 4px rgba(23, 26, 43, 0.025);
             transition: transform 0.15s ease, box-shadow 0.15s ease;
             height: 100%;
+            min-width: 0;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -405,14 +412,15 @@ def apply_spaze_theme() -> None:
             border-color: #D6D2E8;
         }
         .ref-metric-icon-box {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.05rem;
-            margin-bottom: 0.45rem;
+            font-size: 0.95rem;
+            margin-bottom: 0.35rem;
+            flex-shrink: 0;
         }
         .ref-metric-icon-purple { background: #EEE8FF; color: #7047F5; }
         .ref-metric-icon-blue   { background: #EBF3FF; color: #388BFF; }
@@ -421,21 +429,23 @@ def apply_spaze_theme() -> None:
         .ref-metric-icon-cyan   { background: #E6FAFA; color: #0EA5E9; }
 
         .ref-metric-value {
-            font-size: clamp(1.25rem, 1.6vw, 1.55rem);
+            font-size: clamp(1.00rem, 1.22vw, 1.30rem);
             font-weight: 800;
             color: #19213A;
             line-height: 1.15;
-            letter-spacing: -0.3px;
+            letter-spacing: -0.2px;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             display: flex;
             align-items: center;
-            gap: 0.35rem;
+            gap: 0.30rem;
         }
         .ref-metric-label {
-            font-size: 0.74rem;
+            font-size: 0.70rem;
             color: #66718B;
             font-weight: 600;
-            margin-top: 0.25rem;
+            margin-top: 0.2rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;

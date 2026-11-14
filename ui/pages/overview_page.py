@@ -8,13 +8,14 @@ from __future__ import annotations
 import streamlit as st
 
 from models.floorplan_schema import FloorPlan, Room, ScaleInfo
+from ui.components import safe_html
 from ui.state import StateManager
 
 
 def render_overview_page() -> None:
     """Render the Stage 00 Workspace Overview dashboard matching reference design."""
     # 1. Hero Section
-    st.markdown(
+    safe_html(
         """
         <div style="background: linear-gradient(135deg, #FFFFFF 0%, #F5F3FF 100%); border: 1px solid #E9E7F2; border-radius: 18px; padding: 2.2rem 2.0rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(112, 71, 245, 0.05);">
             <div style="display:inline-block; background:#EEE8FF; color:#7047F5; padding:4px 10px; border-radius:8px; font-size:0.76rem; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; margin-bottom:0.75rem;">
@@ -29,8 +30,7 @@ def render_overview_page() -> None:
                 and transforms validated layouts into interactive 3D WebGL environments with binary GLB export.
             </div>
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
     # Quick Action Buttons
@@ -54,19 +54,18 @@ def render_overview_page() -> None:
     st.write("")
 
     # 2. Pipeline Architecture Cards
-    st.markdown(
+    safe_html(
         """
         <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:#69738B; letter-spacing:0.8px; margin-bottom:0.6rem;">
             Integrated Architectural GenAI Pipeline
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
     
     col1, col2, col3, col4 = st.columns(4, gap="medium")
 
     with col1:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="height: 100%;">
                 <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📐</div>
@@ -75,12 +74,11 @@ def render_overview_page() -> None:
                     Local OpenCV preprocessing, morphological wall detection, adaptive thresholding, and closed room contour extraction with interactive scale calibration.
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     with col2:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="height: 100%;">
                 <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🧠</div>
@@ -89,12 +87,11 @@ def render_overview_page() -> None:
                     PyTorch CVAE trained on paired residential layouts. Synthesizes 3 distinct alternatives conditioned on Space-Efficient, Open, and Privacy design intents in 8.4 ms.
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     with col3:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="height: 100%;">
                 <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🧊</div>
@@ -103,12 +100,11 @@ def render_overview_page() -> None:
                     Shapely & Trimesh procedural geometry. Shared interior wall deduplication, physical walk-through apertures, modular furniture, and native Plotly WebGL viewer.
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     with col4:
-        st.markdown(
+        safe_html(
             """
             <div class="section-card" style="height: 100%;">
                 <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📊</div>
@@ -117,19 +113,17 @@ def render_overview_page() -> None:
                     Empirical validation loss, KL divergence, layout diversity (1-IoU), preference sensitivity metrics, CV ground-truth precision/recall, and procedural baseline benchmarks.
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     # 3. Active Project Diagnostics
     st.markdown("---")
-    st.markdown(
+    safe_html(
         """
         <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:#69738B; letter-spacing:0.8px; margin-bottom:0.6rem;">
             Active Project Session
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
     has_fp = StateManager.has_floorplan()
@@ -139,7 +133,7 @@ def render_overview_page() -> None:
     p_col1, p_col2, p_col3, p_col4 = st.columns(4)
 
     with p_col1:
-        st.markdown(
+        safe_html(
             f"""
             <div class="metric-card">
                 <div class="metric-title">2D Floor Plan</div>
@@ -148,12 +142,11 @@ def render_overview_page() -> None:
                 </div>
                 <div class="metric-sub">{len(st.session_state.floorplan.confirmed_rooms) if has_fp else 0} confirmed rooms</div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     with p_col2:
-        st.markdown(
+        safe_html(
             f"""
             <div class="metric-card">
                 <div class="metric-title">CVAE Alternatives</div>
@@ -162,12 +155,11 @@ def render_overview_page() -> None:
                 </div>
                 <div class="metric-sub">Space-Efficient, Open, Privacy</div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     with p_col3:
-        st.markdown(
+        safe_html(
             f"""
             <div class="metric-card">
                 <div class="metric-title">3D Architectural Model</div>
@@ -176,12 +168,11 @@ def render_overview_page() -> None:
                 </div>
                 <div class="metric-sub">Plotly WebGL + Binary GLB</div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     with p_col4:
-        st.markdown(
+        safe_html(
             f"""
             <div class="metric-card">
                 <div class="metric-title">Physical Calibration</div>
@@ -190,8 +181,7 @@ def render_overview_page() -> None:
                 </div>
                 <div class="metric-sub">pixels / meter</div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
 

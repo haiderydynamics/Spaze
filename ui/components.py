@@ -2,11 +2,28 @@
 
 Implements reference-locked top bar with stage title and workflow ribbon,
 as well as metric cards with icon boxes matching the visual reference image.
+Guarantees clean HTML rendering with zero Markdown code-block regression.
 """
 from typing import Optional
 import streamlit as st
 
 from ui.state import StateManager
+
+
+def clean_html(html_str: str) -> str:
+    """Normalize HTML markup by removing all leading and trailing whitespace from every line.
+    
+    This prevents CommonMark markdown parsers from misinterpreting indented HTML
+    as indented code blocks (the CommonMark 4-space rule), which causes raw HTML
+    fragments (like <div>, </div>, </tbody>, </table>) to display in the browser.
+    """
+    lines = [line.strip() for line in html_str.strip().splitlines() if line.strip()]
+    return "\n".join(lines)
+
+
+def safe_html(html_str: str, **kwargs) -> None:
+    """Safely render HTML in Streamlit with zero leading indentation."""
+    st.markdown(clean_html(html_str), unsafe_allow_html=True)
 
 
 STAGE_HEADER_INFO = {
@@ -50,7 +67,7 @@ def render_top_header(current_stage: str) -> None:
     info = STAGE_HEADER_INFO.get(current_stage, ("Stage", "Architectural Workspace", "SPAZE GenAI Workspace", "📐"))
     tag_prefix, title, subtitle, icon = info
 
-    st.markdown(
+    safe_html(
         f"""
         <div class="spaze-top-bar">
             <div class="stage-title-wrap">
@@ -62,8 +79,7 @@ def render_top_header(current_stage: str) -> None:
             </div>
             {pipeline_html}
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
@@ -74,7 +90,7 @@ def render_metric_card(
     val_color: str = "#19213A",
 ) -> None:
     """Render a styled compact architectural metric card."""
-    st.markdown(
+    safe_html(
         f"""
         <div class="ref-metric-card">
             <div>
@@ -83,8 +99,7 @@ def render_metric_card(
             </div>
             <div style="font-size:0.70rem; color:#8E98AF; margin-top:0.25rem;">{subtitle}</div>
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
@@ -96,10 +111,10 @@ def render_reference_metric(
     badge_html: str = "",
 ) -> None:
     """Render a single metric card strictly matching the reference image layout."""
-    st.markdown(
+    safe_html(
         f"""
         <div class="ref-metric-card">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.35rem;">
                 <div class="ref-metric-icon-box ref-metric-icon-{icon_type}">{icon}</div>
                 {badge_html}
             </div>
@@ -108,11 +123,11 @@ def render_reference_metric(
                 <div class="ref-metric-label">{label}</div>
             </div>
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
 def render_page_header(stage_tag: str, title: str, subtitle: str) -> None:
     """Fallback page header helper for backward compatibility."""
     pass
+

@@ -19,7 +19,7 @@ from evaluation.benchmark_suite import BenchmarkSuite, ComparisonMetricRow
 from evaluation.cvae_evaluator import CVAEEvaluator, CVAEEvaluationMetrics
 from evaluation.cv_evaluator import CVEvaluator, CVEvaluationResult
 from models.floorplan_schema import FloorPlan
-from ui.components import render_metric_card, render_page_header
+from ui.components import render_metric_card, render_page_header, safe_html
 from ui.state import StateManager
 
 
@@ -41,13 +41,12 @@ def render_evaluation_page() -> None:
     # -------------------------------------------------------------------------
     # Section A: Primary Research Metric Cards
     # -------------------------------------------------------------------------
-    st.markdown(
+    safe_html(
         """
         <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:#69738B; letter-spacing:0.8px; margin-bottom:0.6rem;">
             Core Model & System Metrics
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
     # 3D Gen time from active 3d result if available
@@ -95,7 +94,7 @@ def render_evaluation_page() -> None:
 
     with col_cv_stat:
         badge_cls = "badge-green" if cv_result.status == "Evaluated" else "badge-amber"
-        st.markdown(f"**Status**: <span class='badge {badge_cls}'>{cv_result.status}</span>", unsafe_allow_html=True)
+        safe_html(f"<div><span style='font-weight:700;'>Status:</span> <span class='badge {badge_cls}'>{cv_result.status}</span></div>")
         st.caption(cv_result.notes)
 
     with col_cv_prec:
@@ -140,7 +139,7 @@ def render_evaluation_page() -> None:
 
     with col_arch:
         st.markdown("#### Model Specification & Architecture")
-        st.markdown(
+        safe_html(
             f"""
             <div class="section-card" style="font-size: 0.85rem; padding: 1.1rem;">
                 <p>• <b>Framework:</b> PyTorch 2.x (CPU/CUDA capable)</p>
@@ -151,8 +150,7 @@ def render_evaluation_page() -> None:
                 <p>• <b>Total Parameters:</b> {cvae_metrics.model_param_count:,}</p>
                 <p>• <b>Model Weight Size:</b> {cvae_metrics.model_size_mb:.2f} MB</p>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     # -------------------------------------------------------------------------
@@ -187,7 +185,7 @@ def render_evaluation_page() -> None:
     p1, p2, p3 = st.columns(3, gap="medium")
 
     with p1:
-        st.markdown(
+        safe_html(
             f"""
             <div class="section-card">
                 <div style="font-size: 1.3rem;">📐</div>
@@ -200,12 +198,11 @@ def render_evaluation_page() -> None:
                     <span style="color:#19B978; font-weight:700;">{cvae_metrics.space_efficiency_ratio * 100:.1f}%</span>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     with p2:
-        st.markdown(
+        safe_html(
             f"""
             <div class="section-card">
                 <div style="font-size: 1.3rem;">🛋️</div>
@@ -218,12 +215,11 @@ def render_evaluation_page() -> None:
                     <span style="color:#7047F5; font-weight:700;">{cvae_metrics.openness_connectivity_score:.3f}</span>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     with p3:
-        st.markdown(
+        safe_html(
             f"""
             <div class="section-card">
                 <div style="font-size: 1.3rem;">🚪</div>
@@ -236,6 +232,5 @@ def render_evaluation_page() -> None:
                     <span style="color:#7047F5; font-weight:700;">{cvae_metrics.privacy_isolation_distance:.2f} m</span>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
