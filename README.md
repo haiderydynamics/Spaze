@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SPAZE — Phase 1: Foundation, Floor-Plan Image Processing & Structured Room Extraction
 
 > **Tagline:** Imagine. Generate. Inhabit.  
@@ -269,3 +270,6 @@ The structured JSON output produced by Phase 1 matches the requirements for the 
 ```
 
 The Phase 2 synthetic layout generator and CVAE can directly ingest `confirmed_rooms` (or active `candidate_rooms`) as normalized spatial vectors $[x, y, w, h, \text{type\_id}]$ without needing to re-parse raw images or depend on Streamlit.
+=======
+# Spaze
+>>>>>>> 2ebb3d169f2d2bb756252b3c46f6f148cf6d0f5a
