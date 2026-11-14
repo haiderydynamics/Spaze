@@ -1,0 +1,18 @@
+{
+  "total_pairs_generated": 3000,
+  "num_families": 3000,
+  "preference_distribution": {
+    "space_efficient": 1001,
+    "open_layout": 991,
+    "privacy_focused": 1008
+  },
+  "room_count_distribution": {
+    "4_rooms": 517,
+    "5_rooms": 461,
+    "6_rooms": 507,
+    "7_rooms": 510,
+    "8_rooms": 501,
+    "9_rooms": 504
+  },
+  "saved_file": "datasets\\generated\\synthetic_pairs.json"
+}

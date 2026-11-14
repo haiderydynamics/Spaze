@@ -1,0 +1,62 @@
+{
+  "image_filename": "sample_floorplan.png",
+  "canvas_width": 800,
+  "canvas_height": 600,
+  "scale_meters": 13.6,
+  "scale_pixels": 680,
+  "ground_truth_walls": [
+    {"start": [60, 60], "end": [740, 60], "type": "exterior"},
+    {"start": [740, 60], "end": [740, 540], "type": "exterior"},
+    {"start": [740, 540], "end": [60, 540], "type": "exterior"},
+    {"start": [60, 540], "end": [60, 60], "type": "exterior"},
+    {"start": [60, 340], "end": [220, 340], "type": "interior"},
+    {"start": [270, 340], "end": [420, 340], "type": "interior"},
+    {"start": [420, 60], "end": [420, 180], "type": "interior"},
+    {"start": [420, 230], "end": [420, 340], "type": "interior"},
+    {"start": [420, 390], "end": [420, 540], "type": "interior"},
+    {"start": [280, 340], "end": [280, 440], "type": "interior"},
+    {"start": [280, 490], "end": [280, 540], "type": "interior"},
+    {"start": [420, 300], "end": [520, 300], "type": "interior"},
+    {"start": [570, 300], "end": [740, 300], "type": "interior"},
+    {"start": [420, 380], "end": [520, 380], "type": "interior"},
+    {"start": [570, 380], "end": [740, 380], "type": "interior"}
+  ],
+  "ground_truth_rooms": [
+    {
+      "name": "Living Room",
+      "room_type": "living_room",
+      "bbox": [60, 60, 420, 340],
+      "area_pixels": 100800
+    },
+    {
+      "name": "Kitchen",
+      "room_type": "kitchen",
+      "bbox": [60, 340, 280, 540],
+      "area_pixels": 44000
+    },
+    {
+      "name": "Hallway",
+      "room_type": "hallway",
+      "bbox": [280, 340, 420, 540],
+      "area_pixels": 28000
+    },
+    {
+      "name": "Bedroom 1",
+      "room_type": "bedroom",
+      "bbox": [420, 60, 740, 300],
+      "area_pixels": 76800
+    },
+    {
+      "name": "Bathroom",
+      "room_type": "bathroom",
+      "bbox": [420, 300, 740, 380],
+      "area_pixels": 25600
+    },
+    {
+      "name": "Bedroom 2",
+      "room_type": "bedroom",
+      "bbox": [420, 380, 740, 540],
+      "area_pixels": 51200
+    }
+  ]
+}

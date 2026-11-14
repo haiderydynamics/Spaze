@@ -1,0 +1,322 @@
+# SPAZE – PHASE 1: FOUNDATION & FLOOR PLAN PROCESSING
+
+Act as a senior Python developer and computer vision engineer.
+
+I am developing SPAZE, an AI-powered 2D-to-3D architectural layout generation application.
+
+We have a strict 30-hour development deadline. This is Phase 1 of a four-phase project. Do not implement future phases prematurely.
+
+## Technology stack
+- Python 3.11
+- Streamlit
+- OpenCV
+- NumPy
+- Pillow
+- Matplotlib
+- Shapely
+
+All dependencies must be free and open source. Do not use paid APIs or services.
+
+## Tasks
+
+1. Create a clean and modular project structure.
+2. Create a premium-looking Streamlit interface branded SPAZE.
+3. Implement JPG, JPEG and PNG floor-plan uploads.
+4. Display the uploaded floor plan.
+5. Implement OpenCV preprocessing:
+   - Grayscale conversion
+   - Noise reduction
+   - Thresholding
+   - Edge detection
+   - Wall-line detection
+   - Contour detection
+6. Extract basic room regions and their approximate boundaries where possible.
+7. Allow users to manually correct room labels and dimensions when automatic detection fails.
+8. Represent the processed floor plan as structured data using room coordinates, dimensions and room types.
+9. Display the processed result and extracted room information.
+10. Handle invalid images and processing errors gracefully.
+
+## Expected deliverables
+
+- Complete working source code.
+- requirements.txt
+- Modular Python files.
+- Instructions to install dependencies and run the application.
+- One sample floor-plan image for testing.
+- A working upload and preprocessing demonstration.
+
+## Important restrictions
+
+- Do not use pretrained paid APIs.
+- Do not use an LLM API for floor-plan interpretation.
+- Do not generate fake room detections just to make the UI look complete.
+- Clearly identify uncertain detections and allow manual correction.
+- Keep the code compatible with the later Conditional VAE and 3D generation modules.
+
+## Development rules
+
+Explain the purpose of each file.
+Provide complete executable code rather than pseudocode.
+Test imports and module integration.
+Avoid unnecessary dependencies.
+Prioritize a functioning MVP over unnecessary features.
+
+At the end, provide a checklist of completed tasks and identify any known limitations.
+
+Do not proceed to Phase 2 until Phase 1 works successfully.
+
+
+
+# SPAZE – PHASE 2: GENERATIVE AI ENGINE
+
+Act as a deep learning engineer specializing in Variational Autoencoders and generative modeling.
+
+We are continuing the SPAZE project. Phase 1 has already created a floor-plan processing pipeline and structured room representations.
+
+Our objective is to implement a Conditional Variational Autoencoder (CVAE) from scratch using PyTorch.
+
+## Technology stack
+- Python
+- PyTorch
+- NumPy
+- Pandas
+- Matplotlib
+
+All libraries must be free and open source.
+
+## Tasks
+
+1. Design a synthetic architectural floor-plan dataset generator.
+2. Generate approximately 2,000–5,000 synthetic layouts if computationally feasible.
+3. Represent layouts using structured room information:
+   - Room type
+   - X and Y coordinates
+   - Width and height
+   - Orientation
+   - Room adjacency
+4. Generate preference labels:
+   - Space-efficient
+   - Open layout
+   - Privacy-focused
+5. Implement a Conditional VAE with:
+   - Encoder
+   - Mean and variance layers
+   - Reparameterization trick
+   - Latent space
+   - Conditional decoder
+6. Implement the VAE reconstruction loss and KL divergence loss.
+7. Train the model using the synthetic dataset.
+8. Save model weights and training history.
+9. Implement inference to generate three alternative layouts from one input.
+10. Allow user preferences to influence generated layouts.
+11. Add a reproducible random seed and model evaluation.
+
+## Research contribution
+
+The core contribution is preference-controlled architectural layout generation using a Conditional VAE.
+
+The model must generate different alternatives instead of merely copying its input.
+
+## Evaluation
+
+Measure:
+- Reconstruction loss
+- KL divergence
+- Training time
+- Inference time
+- Layout diversity
+- Geometric validity
+
+Compare generated layouts with held-out synthetic samples.
+
+## Integration requirements
+
+The output must use a structured format compatible with Phase 1 and Phase 3.
+
+Save the trained model as a .pth file.
+
+Keep the model small enough to train on a free Google Colab GPU or a CPU fallback.
+
+## Important restrictions
+
+- Implement the CVAE architecture yourself.
+- Do not simply download a pretrained generative model.
+- Do not claim that synthetic layouts represent professional architectural designs.
+- Do not rely exclusively on random coordinate generation as the final AI output.
+- Explain the mathematical formulation and every important model component.
+
+Provide complete executable code, training instructions, inference code and a sample output.
+
+Do not proceed to Phase 3 until the model can generate and save three distinct layouts.
+
+
+
+# SPAZE – PHASE 3: INTELLIGENT 3D GENERATION
+
+Act as a senior Python 3D graphics and computational geometry developer.
+
+We are continuing SPAZE. Phase 1 provides structured floor-plan data, and Phase 2 provides three generated layout alternatives from our trained Conditional VAE.
+
+Now implement the 3D generation and visualization pipeline.
+
+## Technology stack
+- Python
+- Trimesh
+- Shapely
+- Plotly
+- NumPy
+- Streamlit
+
+All dependencies must be free and open source.
+
+## Tasks
+
+### A. Layout validation
+
+1. Check room boundaries.
+2. Check overlapping rooms.
+3. Check room dimensions.
+4. Check furniture collisions.
+5. Check whether room connections are preserved.
+6. Calculate a geometric constraint satisfaction score.
+7. Reject or flag invalid layouts.
+
+### B. 3D geometry generation
+
+Convert each valid layout into 3D geometry.
+
+Generate:
+- Floor surfaces.
+- Room walls.
+- Interior partitions.
+- Door openings or clearly represented door placements.
+- Windows.
+- Basic furniture such as beds, tables, sofas and chairs.
+
+Use simple procedural geometry rather than expensive rendering systems.
+
+### C. Interactive 3D viewer
+
+1. Display the generated 3D building.
+2. Support rotation and zoom.
+3. Allow users to switch between three alternatives.
+4. Use different colors for different rooms.
+5. Provide an isometric viewing option.
+
+### D. Export functionality
+
+Implement:
+- GLB 3D export.
+- PNG floor-plan export.
+- Download functionality through Streamlit.
+
+### E. User experience
+
+The user must be able to:
+1. Upload a floor plan.
+2. Generate alternative layouts.
+3. Select an alternative.
+4. Validate the layout.
+5. View the corresponding 3D environment.
+6. Export the model.
+
+## Important requirements
+
+- Preserve the actual coordinates and dimensions from the generated layouts.
+- Do not use a static screenshot as the 3D output.
+- The generated 3D model must be an actual editable geometric model.
+- Keep the viewer lightweight.
+- Handle invalid layouts gracefully.
+- Reuse the existing Phase 1 and Phase 2 modules rather than rewriting them.
+
+Provide complete executable code and explain integration between modules.
+
+Do not proceed to Phase 4 until the entire upload-to-3D workflow works.
+
+
+
+# SPAZE – PHASE 4: TESTING, EVALUATION AND FINALIZATION
+
+Act as a software testing engineer, GenAI researcher and UI/UX developer.
+
+We have implemented the first three phases of SPAZE.
+
+Now integrate, test, evaluate and finalize the complete application.
+
+## Tasks
+
+### A. Integration
+1. Connect image processing, CVAE inference, layout validation and 3D generation.
+2. Ensure all modules use consistent data structures.
+3. Fix import and dependency conflicts.
+4. Verify that model weights load correctly.
+5. Ensure the entire pipeline works from one interface.
+
+### B. Functional testing
+Test:
+- Valid floor-plan uploads.
+- Invalid image uploads.
+- Different room configurations.
+- Three generated alternatives.
+- Constraint validation.
+- 3D visualization.
+- GLB export.
+- PNG export.
+
+### C. Performance evaluation
+
+Calculate and display:
+- Wall detection precision and recall on manually annotated test samples.
+- Room boundary IoU where ground-truth annotations are available.
+- CVAE reconstruction loss.
+- Layout diversity.
+- Constraint satisfaction rate.
+- Furniture collision rate.
+- Model inference time.
+- 3D generation time.
+- Peak memory consumption where measurable.
+
+Compare against a simple baseline such as procedural/random layout generation.
+
+Do not fabricate performance results.
+
+### D. UI/UX refinement
+
+Create a polished SPAZE dashboard with:
+- Consistent branding.
+- Clear navigation.
+- Upload section.
+- Preference selection.
+- Generated layout comparison.
+- Interactive 3D viewer.
+- Evaluation metrics.
+- Download options.
+
+### E. Final documentation
+
+Prepare:
+1. Project abstract.
+2. Problem statement.
+3. Objectives.
+4. Existing system limitations.
+5. Proposed system.
+6. System architecture.
+7. CVAE mathematical explanation.
+8. Dataset generation methodology.
+9. Implementation details.
+10. Evaluation methodology and actual results.
+11. Limitations.
+12. Future scope.
+13. Conclusion.
+
+Also prepare a college presentation and a short live demonstration script.
+
+## Important restrictions
+
+- Do not introduce new major features.
+- Do not replace our trained CVAE with an external API.
+- Do not claim results that have not been measured.
+- Prioritize stability over visual complexity.
+- Keep all dependencies free.
+
+At completion, provide the final project folder structure, setup instructions, testing checklist and demonstration workflow.
